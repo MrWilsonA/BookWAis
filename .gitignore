@@ -1,0 +1,36 @@
+
+# .NET
+bin/
+obj/
+.vs/
+*.user
+*.suo
+
+# Node / React / Vite
+node_modules/
+dist/
+.vite/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+
+# Test
+TestResults/
+coverage/
+
+# Local database
+*.db
+*.sqlite
+*.sqlite3
