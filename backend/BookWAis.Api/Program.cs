@@ -3,8 +3,8 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.service.AddDbContext<AppDbContext>(options => 
-    options.UseNpsql(
+builder.Services.AddDbContext<AppDbContext>(options => 
+    options.UseNpgsql(
         builder.Configuration.GetConnectionString("DefaultConnection")
     )
 );

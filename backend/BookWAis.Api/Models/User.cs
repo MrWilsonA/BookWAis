@@ -1,4 +1,4 @@
-BookWAis.API.Models;
+namespace BookWAis.Api.Models;
 
 public class User
 {
