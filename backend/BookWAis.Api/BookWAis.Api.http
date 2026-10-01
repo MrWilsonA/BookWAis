@@ -1,6 +1,47 @@
-@BookWAis.Api_HostAddress = http://localhost:5011
+@host = http://localhost:5011
 
-GET {{BookWAis.Api_HostAddress}}/weatherforecast/
-Accept: application/json
+### GET all speakers
+GET {{host}}/api/Speakers
 
-###
+### POST speaker
+POST {{host}}/api/Speakers
+Content-Type: application/json
+
+{
+  "name": "Alice",
+  "profile": "Software Engineer",
+  "biography": "Backend developer",
+  "photoUrl": "alice.jpg"
+}
+
+### GET all sessions
+GET {{host}}/api/Sessions
+
+### POST session
+POST {{host}}/api/Sessions
+Content-Type: application/json
+
+{
+  "title": "ASP.NET Core Workshop",
+  "speakerId": 1,
+  "room": "A101",
+  "startTime": "2026-10-01T09:00:00Z",
+  "endTime": "2026-10-01T11:00:00Z",
+  "capacity": 50
+}
+
+### PUT session
+PUT {{host}}/api/Sessions/1
+Content-Type: application/json
+
+{
+  "title": "Updated ASP.NET Core Workshop",
+  "speakerId": 1,
+  "room": "A102",
+  "startTime": "2026-10-01T09:00:00Z",
+  "endTime": "2026-10-01T11:00:00Z",
+  "capacity": 60
+}
+
+### DELETE session
+DELETE {{host}}/api/Sessions/1
