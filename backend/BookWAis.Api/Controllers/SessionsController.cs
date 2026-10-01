@@ -36,8 +36,7 @@ public class SessionsController : ControllerBase
     {
         var existingSession = await _context.Sessions.FindAsync(id);
 
-        if (existingSession == null)
-            return NotFound();
+        if (existingSession == null) return NotFound();
 
         existingSession.Title = session.Title;
         existingSession.SpeakerId = session.SpeakerId;
@@ -56,8 +55,7 @@ public class SessionsController : ControllerBase
     {
         var existingSession = await _context.Sessions.FindAsync(id);
 
-        if (existingSession == null)
-            return NotFound();
+        if (existingSession == null) return NotFound();
 
         _context.Sessions.Remove(existingSession);
         await _context.SaveChangesAsync();
