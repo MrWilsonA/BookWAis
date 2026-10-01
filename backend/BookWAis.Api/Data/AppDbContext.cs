@@ -16,11 +16,13 @@ public class AppDbContext : DbContext
     public DbSet<Session> Sessions { get; set; }
     public DbSet<Reservation> Reservations { get; set; }
 
-    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Reservation>()
             .HasIndex(r => new { r.UserId, r.SessionId })
             .IsUnique();
+
+        modelBuilder.Entity<Reservation>()
+            .HasIndex(r => r.SessionId);
     }
 }

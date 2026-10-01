@@ -25,7 +25,11 @@ public class ReservationsController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<Reservation>> CreateReservation(Reservation reservation)
     {
-        var session = await _context.Sessions.FindAsync(reservation.SessionId);
+        await using var transaction = await _context.Database.BeginTransactionAsync();
+
+        var session = await _context.Sessions
+            .FromSqlInterpolated($"SELECT * FROM \"Sessions\" WHERE \"Id\" = {reservation.SessionId} FOR UPDATE")
+            .FirstOrDefaultAsync();
         if (session == null) return NotFound("Session Not Found!");
 
         var duplicate = await _context.Reservations.AnyAsync(r =>
@@ -39,6 +43,7 @@ public class ReservationsController : ControllerBase
 
         _context.Reservations.Add(reservation);
         await _context.SaveChangesAsync();
+        await transaction.CommitAsync();
 
         return reservation;
     }
@@ -46,14 +51,18 @@ public class ReservationsController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<ActionResult<Reservation>> DeleteReservation(int id)
     {
-        var existingReservation =
-            await _context.Reservations.FindAsync(id);
+        await using var transaction = await _context.Database.BeginTransactionAsync();
+        var existingReservation = await _context.Reservations.FindAsync(id);
 
-        if (existingReservation == null)
-            return NotFound();
+        if (existingReservation == null) return NotFound();
+
+        await _context.Sessions
+            .FromSqlInterpolated($"SELECT * FROM \"Sessions\" WHERE \"Id\" = {existingReservation.SessionId} FOR UPDATE")
+            .FirstOrDefaultAsync();
 
         _context.Reservations.Remove(existingReservation);
         await _context.SaveChangesAsync();
+        await transaction.CommitAsync();
 
         return existingReservation;
     }

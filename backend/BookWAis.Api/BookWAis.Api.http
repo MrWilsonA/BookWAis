@@ -45,3 +45,31 @@ Content-Type: application/json
 
 ### DELETE session
 DELETE {{host}}/api/Sessions/1
+
+### GET all reservations
+GET {{host}}/api/Reservations
+
+### DELETE reservation
+DELETE {{host}}/api/Reservations/6
+
+### RESERVATION session
+POST http://localhost:5011/api/Reservations
+Content-Type: application/json
+
+{
+  "userId": 1,
+  "sessionId": 1
+}
+
+### PUT session 3
+PUT {{host}}/api/Sessions/3
+Content-Type: application/json
+
+{
+  "title": "ASP.NET Core Workshop",
+  "speakerId": 1,
+  "room": "A101",
+  "startTime": "2026-10-01T09:00:00Z",
+  "endTime": "2026-10-01T11:00:00Z",
+  "capacity": 5
+}

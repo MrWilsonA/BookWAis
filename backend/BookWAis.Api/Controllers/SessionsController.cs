@@ -17,9 +17,23 @@ public class SessionsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<List<Session>> GetSessions()
+    public async Task<IActionResult> GetSessions()
     {
-        return await _context.Sessions.ToListAsync();
+        var sessions = await _context.Sessions
+            .Select(s => new
+            {
+                s.Id,
+                s.Title,
+                s.SpeakerId,
+                s.Room,
+                s.StartTime,
+                s.EndTime,
+                s.Capacity,
+                RemainingSeats = s.Capacity - _context.Reservations.Count(r => r.SessionId == s.Id)
+            })
+            .ToListAsync();
+        
+        return Ok(sessions);
     }
 
     [HttpPost]
@@ -34,9 +48,17 @@ public class SessionsController : ControllerBase
     [HttpPut("{id}")]
     public async Task<ActionResult<Session>> UpdateSession(int id, Session session)
     {
-        var existingSession = await _context.Sessions.FindAsync(id);
+        await using var transaction = await _context.Database.BeginTransactionAsync();
+        var existingSession = await _context.Sessions
+            .FromSqlInterpolated($"SELECT * FROM \"Sessions\" WHERE \"Id\" = {id} FOR UPDATE")
+            .FirstOrDefaultAsync();
 
         if (existingSession == null) return NotFound();
+
+        var bookedCount = await _context.Reservations.CountAsync(r => r.SessionId == id);
+
+        if (session.Capacity < bookedCount)
+            return Conflict("Capacity cannot be lower than current reservations");
 
         existingSession.Title = session.Title;
         existingSession.SpeakerId = session.SpeakerId;
@@ -46,6 +68,7 @@ public class SessionsController : ControllerBase
         existingSession.Capacity = session.Capacity;
 
         await _context.SaveChangesAsync();
+        await transaction.CommitAsync();
 
         return existingSession;
     }
