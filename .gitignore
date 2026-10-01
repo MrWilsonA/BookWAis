@@ -29,6 +29,7 @@ Thumbs.db
 # Test
 TestResults/
 coverage/
+tests/BookWAis.LoadTests/reports/
 
 # Local database
 *.db
