@@ -4,6 +4,31 @@ using NBomber.Http.CSharp;
 
 var httpClient = new HttpClient();
 
+var browseScenario = Scenario.Create("browse_sessions_test", async context =>
+{
+    var request = Http.CreateRequest(
+        "GET",
+        "http://localhost:5011/api/Sessions"
+    );
+
+    var response = await Http.Send(httpClient, request);
+
+    if (!response.Payload.Value.IsSuccessStatusCode)
+    {
+        var body = await response.Payload.Value.Content.ReadAsStringAsync();
+        Console.WriteLine($"HTTP {(int)response.Payload.Value.StatusCode}: {body}");
+    }
+
+    return response;
+})
+.WithLoadSimulations(
+    Simulation.Inject(
+        rate: 1000,
+        interval: TimeSpan.FromSeconds(1),
+        during: TimeSpan.FromSeconds(1)
+    )
+);
+
 var scenario = Scenario.Create("booking_test", async context =>
 {
     var userId = (int)context.InvocationNumber;
@@ -39,5 +64,5 @@ var scenario = Scenario.Create("booking_test", async context =>
 );
 
 NBomberRunner
-    .RegisterScenarios(scenario)
+    .RegisterScenarios(browseScenario)
     .Run();
