@@ -2,10 +2,8 @@ import { useEffect, useState } from "react"
 import { deleteReservation, getReservations, getSessions } from "../api/sessions"
 import type { Reservation } from "../types/reservation"
 import type { Session } from "../types/session"
-import { getParticipantId, saveParticipantId } from "../utils/participant"
 
 export default function ReservationsPage() {
-    const [userId, setUserId] = useState(getParticipantId)
     const [reservations, setReservations] = useState<Reservation[]>([])
     const [sessions, setSessions] = useState<Session[]>([])
     const [loading, setLoading] = useState(true)
@@ -22,7 +20,7 @@ export default function ReservationsPage() {
             .finally(() => setLoading(false))
     }, [])
 
-    const userReservations = reservations.filter((reservation) => reservation.userId === userId)
+    const userReservations = reservations
 
     async function cancelReservation(id: number) {
         setCancelingId(id)
@@ -51,21 +49,7 @@ export default function ReservationsPage() {
                 <p>View or cancel your reserved workshop seats.</p>
             </header>
 
-            <div className="participant-bar">
-                <label htmlFor="reservation-participant-id">Participant ID</label>
-                <input
-                    id="reservation-participant-id"
-                    min="1"
-                    type="number"
-                    value={userId}
-                    onChange={(event) => {
-                        const id = Number(event.target.value)
-                        setUserId(id)
-                        saveParticipantId(id)
-                    }}
-                />
-                {message && <span className="booking-message">{message}</span>}
-            </div>
+            {message && <p className="booking-message">{message}</p>}
 
             {userReservations.length === 0 ? (
                 <p className="status-message">You have no reservations.</p>

@@ -27,13 +27,14 @@ export async function getSessions(): Promise<Session[]> {
     return response.json()
 }
 
-export async function createReservation(userId: number, sessionId: number) {
+export async function createReservation(sessionId: number) {
     const response = await fetch(`${apiUrl}/Reservations`, {
         method: "POST",
+        credentials: "include",
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify({ userId, sessionId }),
+        body: JSON.stringify({ sessionId }),
     })
 
     if (!response.ok) {
@@ -44,7 +45,7 @@ export async function createReservation(userId: number, sessionId: number) {
 }
 
 export async function getReservations(): Promise<Reservation[]> {
-    const response = await fetch(`${apiUrl}/Reservations`)
+    const response = await fetch(`${apiUrl}/Reservations`, { credentials: "include" })
 
     if (!response.ok) {
         throw new Error(`Request failed with status ${response.status}`)
@@ -56,6 +57,7 @@ export async function getReservations(): Promise<Reservation[]> {
 export async function deleteReservation(id: number) {
     const response = await fetch(`${apiUrl}/Reservations/${id}`, {
         method: "DELETE",
+        credentials: "include",
     })
 
     if (!response.ok) {
@@ -67,6 +69,7 @@ export async function deleteReservation(id: number) {
 export async function createSession(session: Omit<Session, "id" | "remainingSeats">) {
     const response = await fetch(`${apiUrl}/Sessions`, {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(session),
     })
@@ -81,6 +84,7 @@ export async function createSession(session: Omit<Session, "id" | "remainingSeat
 export async function updateSession(id: number, session: Omit<Session, "id" | "remainingSeats">) {
     const response = await fetch(`${apiUrl}/Sessions/${id}`, {
         method: "PUT",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(session),
     })
@@ -93,7 +97,7 @@ export async function updateSession(id: number, session: Omit<Session, "id" | "r
 }
 
 export async function deleteSession(id: number) {
-    const response = await fetch(`${apiUrl}/Sessions/${id}`, { method: "DELETE" })
+    const response = await fetch(`${apiUrl}/Sessions/${id}`, { method: "DELETE", credentials: "include" })
 
     if (!response.ok) {
         throw new Error(await response.text())

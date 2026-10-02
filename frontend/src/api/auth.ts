@@ -1,5 +1,4 @@
 import type { User } from "../types/user"
-import { saveParticipantId } from "../utils/participant"
 
 const apiUrl = import.meta.env.VITE_API_URL
 
@@ -23,7 +22,6 @@ export async function login(username: string, password: string): Promise<User> {
     })
     if (!response.ok) throw new Error(await readError(response))
     const user: User = await response.json()
-    saveParticipantId(user.id)
     return user
 }
 
@@ -36,7 +34,6 @@ export async function register(username: string, email: string, password: string
     })
     if (!response.ok) throw new Error(await readError(response))
     const user: User = await response.json()
-    saveParticipantId(user.id)
     return user
 }
 

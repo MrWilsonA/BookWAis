@@ -3,14 +3,12 @@ import type { Session } from "../types/session";
 import { createReservation, getSessions } from "../api/sessions";
 import { getSpeakers } from "../api/speakers";
 import type { Speaker } from "../types/speaker";
-import { getParticipantId, saveParticipantId } from "../utils/participant";
 
 export default function SessionsPage() {
     const [sessions, setSessions] = useState<Session[]>([])
     const [speakers, setSpeakers] = useState<Speaker[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState("")
-    const [userId, setUserId] = useState(getParticipantId)
     const [bookingId, setBookingId] = useState<number | null>(null)
     const [message, setMessage] = useState("")
 
@@ -29,7 +27,7 @@ export default function SessionsPage() {
         setMessage("")
 
         try {
-            await createReservation(userId, sessionId)
+            await createReservation(sessionId)
             const updatedSessions = await getSessions()
             setSessions(updatedSessions)
             setMessage("Reservation confirmed")
@@ -56,21 +54,7 @@ export default function SessionsPage() {
                 <p>Choose a session and reserve your seat in a few steps.</p>
             </header>
 
-            <div className="participant-bar">
-                <label htmlFor="participant-id">Participant ID</label>
-                <input
-                    id="participant-id"
-                    min="1"
-                    type="number"
-                    value={userId}
-                    onChange={(event) => {
-                        const id = Number(event.target.value)
-                        setUserId(id)
-                        saveParticipantId(id)
-                    }}
-                />
-                {message && <span className="booking-message">{message}</span>}
-            </div>
+            {message && <p className="booking-message">{message}</p>}
 
             <section className="sessions-grid">
                 {sessions.map((session) => {
@@ -90,7 +74,7 @@ export default function SessionsPage() {
                                 </span>
                                 <button
                                     className="reserve-button"
-                                    disabled={isFull || bookingId !== null || userId < 1}
+                                    disabled={isFull || bookingId !== null}
                                     onClick={() => reserve(session.id)}
                                 >
                                     {isFull ? "Full" : bookingId === session.id ? "Booking..." : "Reserve"}

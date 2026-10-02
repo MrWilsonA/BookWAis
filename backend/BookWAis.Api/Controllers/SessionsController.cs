@@ -1,5 +1,6 @@
 using BookWAis.Api.Data;
 using BookWAis.Api.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -37,6 +38,7 @@ public class SessionsController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<Session>> CreateSession(Session session)
     {
         _context.Sessions.Add(session);
@@ -46,6 +48,7 @@ public class SessionsController : ControllerBase
     }
 
     [HttpPut("{id}")]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<Session>> UpdateSession(int id, Session session)
     {
         await using var transaction = await _context.Database.BeginTransactionAsync();
@@ -74,6 +77,7 @@ public class SessionsController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<Session>> DeleteSession(int id)
     {
         var existingSession = await _context.Sessions.FindAsync(id);

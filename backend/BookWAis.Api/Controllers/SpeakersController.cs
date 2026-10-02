@@ -1,5 +1,6 @@
 using BookWAis.Api.Data;
 using BookWAis.Api.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -23,6 +24,7 @@ public class SpeakersController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<Speaker>> CreateSpeaker(Speaker speaker)
     {
         _context.Speakers.Add(speaker);
@@ -32,6 +34,7 @@ public class SpeakersController : ControllerBase
     }
 
     [HttpPut("{id}")]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<Speaker>> UpdateSpeaker(int id, Speaker speaker)
     {
         var existingSpeaker = await _context.Speakers.FindAsync(id);
@@ -49,6 +52,7 @@ public class SpeakersController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<Speaker>> DeleteSpeaker(int id)
     {
         var existingSpeaker = await _context.Speakers.FindAsync(id);
