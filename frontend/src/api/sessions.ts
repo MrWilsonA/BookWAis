@@ -3,6 +3,20 @@ import type { Reservation } from "../types/reservation"
 
 const apiUrl = import.meta.env.VITE_API_URL
 
+async function getErrorMessage(response: Response) {
+    const body = await response.text()
+
+    try {
+        const problem = JSON.parse(body) as { title?: string; errors?: Record<string, string[]> }
+        const validationMessage = problem.errors
+            ? Object.values(problem.errors).flat()[0]
+            : undefined
+        return validationMessage ?? problem.title ?? body
+    } catch {
+        return body
+    }
+}
+
 export async function getSessions(): Promise<Session[]> {
     const response = await fetch(`${apiUrl}/Sessions`)
 
@@ -23,8 +37,7 @@ export async function createReservation(userId: number, sessionId: number) {
     })
 
     if (!response.ok) {
-        const message = await response.text()
-        throw new Error(message || `Request failed with status ${response.status}`)
+        throw new Error((await getErrorMessage(response)) || `Request failed with status ${response.status}`)
     }
 
     return response.json()
