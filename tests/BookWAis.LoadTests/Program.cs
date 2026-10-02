@@ -31,7 +31,7 @@ var browseScenario = Scenario.Create("browse_sessions_test", async context =>
 
 var scenario = Scenario.Create("booking_test", async context =>
 {
-    var userId = 100 + (int)context.InvocationNumber;
+    var userId = 200 + (int)context.InvocationNumber;
 
     var content = JsonContent.Create(new
     {
@@ -99,6 +99,33 @@ var capacityUpdateScenario = Scenario.Create("capacity_update_test", async conte
     )
 );
 
+var cancellationScenario = Scenario.Create("cancellation_test", async context =>
+{
+    var reservationId = 6 + (int)context.InvocationNumber;
+
+    var request = Http.CreateRequest(
+        "DELETE",
+        $"http://localhost:5011/api/Reservations/{reservationId}"
+    );
+
+    var response = await Http.Send(httpClient, request);
+
+    if (!response.Payload.Value.IsSuccessStatusCode)
+    {
+        var body = await response.Payload.Value.Content.ReadAsStringAsync();
+        Console.WriteLine($"HTTP {(int)response.Payload.Value.StatusCode}: {body}");
+    }
+
+    return response;
+})
+.WithLoadSimulations(
+    Simulation.Inject(
+        rate: 5,
+        interval: TimeSpan.FromSeconds(1),
+        during: TimeSpan.FromSeconds(1)
+    )
+);
+
 NBomberRunner
-    .RegisterScenarios(scenario, capacityUpdateScenario)
+    .RegisterScenarios(scenario, cancellationScenario)
     .Run();
