@@ -2,6 +2,8 @@ import { useEffect, useState } from "react"
 import type { FormEvent } from "react"
 import { createSession, deleteSession, getSessions, updateSession } from "../api/sessions"
 import type { Session } from "../types/session"
+import { getSpeakers } from "../api/speakers"
+import type { Speaker } from "../types/speaker"
 
 type SessionForm = {
     title: string
@@ -14,7 +16,7 @@ type SessionForm = {
 
 const emptyForm: SessionForm = {
     title: "",
-    speakerId: 1,
+    speakerId: 0,
     room: "",
     startTime: "",
     endTime: "",
@@ -29,6 +31,7 @@ function toInputDate(value: string) {
 
 export default function AdminSessionsPage() {
     const [sessions, setSessions] = useState<Session[]>([])
+    const [speakers, setSpeakers] = useState<Speaker[]>([])
     const [form, setForm] = useState<SessionForm>(emptyForm)
     const [editingId, setEditingId] = useState<number | null>(null)
     const [message, setMessage] = useState("")
@@ -39,8 +42,12 @@ export default function AdminSessionsPage() {
     }
 
     useEffect(() => {
-        loadSessions()
-            .catch(() => setMessage("Failed to load sessions"))
+        Promise.all([getSessions(), getSpeakers()])
+            .then(([sessionData, speakerData]) => {
+                setSessions(sessionData)
+                setSpeakers(speakerData)
+            })
+            .catch(() => setMessage("Failed to load sessions and speakers"))
             .finally(() => setLoading(false))
     }, [])
 
@@ -69,6 +76,11 @@ export default function AdminSessionsPage() {
     async function submit(event: FormEvent) {
         event.preventDefault()
         setMessage("")
+
+        if (!speakers.some((speaker) => speaker.id === form.speakerId)) {
+            setMessage("Please select an available speaker")
+            return
+        }
 
         const payload = {
             ...form,
@@ -119,16 +131,22 @@ export default function AdminSessionsPage() {
                 <h2>{editingId === null ? "Create session" : "Edit session"}</h2>
                 <div className="form-grid">
                     <label>Title<input required value={form.title} onChange={(event) => updateField("title", event.target.value)} /></label>
-                    <label>Speaker ID<input required min="1" type="number" value={form.speakerId} onChange={(event) => updateField("speakerId", Number(event.target.value))} /></label>
+                    <label>Speaker
+                        <select required value={form.speakerId || ""} onChange={(event) => updateField("speakerId", Number(event.target.value))}>
+                            <option value="" disabled>Select a speaker</option>
+                            {speakers.map((speaker) => <option key={speaker.id} value={speaker.id}>{speaker.name}</option>)}
+                        </select>
+                    </label>
                     <label>Room<input required value={form.room} onChange={(event) => updateField("room", event.target.value)} /></label>
                     <label>Capacity<input required min="1" type="number" value={form.capacity} onChange={(event) => updateField("capacity", Number(event.target.value))} /></label>
                     <label>Start time<input required type="datetime-local" value={form.startTime} onChange={(event) => updateField("startTime", event.target.value)} /></label>
                     <label>End time<input required type="datetime-local" value={form.endTime} onChange={(event) => updateField("endTime", event.target.value)} /></label>
                 </div>
                 <div className="form-actions">
-                    <button className="reserve-button" type="submit">{editingId === null ? "Create session" : "Save changes"}</button>
+                    <button className="reserve-button" type="submit" disabled={speakers.length === 0}>{editingId === null ? "Create session" : "Save changes"}</button>
                     {editingId !== null && <button className="secondary-button" type="button" onClick={resetForm}>Cancel</button>}
                 </div>
+                {speakers.length === 0 && <p className="booking-message">Add a speaker in Manage speakers before saving a session.</p>}
                 {message && <p className="booking-message">{message}</p>}
             </form>
 
@@ -137,6 +155,7 @@ export default function AdminSessionsPage() {
                     <article className="admin-row" key={session.id}>
                         <div>
                             <h2>{session.title}</h2>
+                            <p>Speaker: {speakers.find((speaker) => speaker.id === session.speakerId)?.name ?? "Unavailable"}</p>
                             <p>{session.room} · {session.remainingSeats} seats left of {session.capacity}</p>
                         </div>
                         <div className="row-actions">
