@@ -26,6 +26,8 @@ function AppRoutes() {
     return <Navigate to="/login" replace />
   }
 
+  const isAdmin = user?.role === "Admin"
+
   async function signOut() {
     await logout()
     setUser(null)
@@ -40,7 +42,7 @@ function AppRoutes() {
           <div className="nav-links">
             <Link to="/sessions">Sessions</Link>
             <Link to="/reservations">My reservations</Link>
-            {user.role === "Admin" && <>
+            {isAdmin && <>
               <Link to="/admin/sessions">Manage sessions</Link>
               <Link to="/admin/speakers">Speakers</Link>
               <Link to="/admin/dashboard">Dashboard</Link>
@@ -55,9 +57,9 @@ function AppRoutes() {
         <Route path="/register" element={user ? <Navigate to="/sessions" replace /> : <RegisterPage onLogin={setUser} />} />
         <Route path="/sessions" element={<SessionsPage />} />
         <Route path="/reservations" element={<ReservationsPage />} />
-        <Route path="/admin/sessions" element={<AdminSessionsPage />} />
-        <Route path="/admin/speakers" element={<AdminSpeakersPage />} />
-        <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
+        <Route path="/admin/sessions" element={isAdmin ? <AdminSessionsPage /> : <Navigate to="/sessions" replace />} />
+        <Route path="/admin/speakers" element={isAdmin ? <AdminSpeakersPage /> : <Navigate to="/sessions" replace />} />
+        <Route path="/admin/dashboard" element={isAdmin ? <AdminDashboardPage /> : <Navigate to="/sessions" replace />} />
       </Routes>
     </>
   )
