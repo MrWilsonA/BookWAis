@@ -62,6 +62,84 @@ button {
   color: #3366cc;
 }
 
+.nav-logout {
+  border: 0;
+  padding: 0;
+  color: #667085;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.nav-logout:hover {
+  color: #b42318;
+}
+
+.auth-page {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  padding: 24px;
+}
+
+.auth-card {
+  display: grid;
+  width: min(100%, 420px);
+  gap: 16px;
+  padding: 32px;
+  border: 1px solid #e4eaf2;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 8px 24px rgba(24, 39, 75, 0.06);
+}
+
+.auth-card h1 {
+  margin: 0;
+  color: #101828;
+  font-size: 2rem;
+}
+
+.auth-description {
+  margin: -4px 0 8px;
+  color: #667085;
+}
+
+.auth-card label {
+  display: grid;
+  gap: 7px;
+  color: #344054;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.auth-card input {
+  width: 100%;
+  border: 1px solid #d0d5dd;
+  border-radius: 8px;
+  padding: 11px;
+  font: inherit;
+}
+
+.auth-message {
+  margin: 0;
+  color: #b42318;
+  font-size: 0.9rem;
+}
+
+.auth-link {
+  margin: 0;
+  color: #667085;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.auth-link a {
+  color: #3366cc;
+  font-weight: 700;
+}
+
 .sessions-page {
   width: min(1120px, calc(100% - 40px));
   margin: 0 auto;

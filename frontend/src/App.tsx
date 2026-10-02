@@ -1,33 +1,72 @@
-import { BrowserRouter, Link, Route, Routes } from "react-router-dom"
+import { BrowserRouter, Link, Navigate, Route, Routes, useLocation, useNavigate } from "react-router-dom"
+import { useEffect, useState } from "react"
+import { getCurrentUser, logout } from "./api/auth"
+import type { User } from "./types/user"
 import SessionsPage from "./pages/SessionsPage"
 import ReservationsPage from "./pages/ReservationsPage"
 import AdminSessionsPage from "./pages/AdminSessionsPage"
 import AdminSpeakersPage from "./pages/AdminSpeakersPage"
 import AdminDashboardPage from "./pages/AdminDashboardPage"
+import LoginPage from "./pages/LoginPage"
+import RegisterPage from "./pages/RegisterPage"
 
-function App() {
+function AppRoutes() {
+  const location = useLocation()
+  const navigate = useNavigate()
+  const [user, setUser] = useState<User | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    getCurrentUser().then(setUser).finally(() => setLoading(false))
+  }, [])
+
+  if (loading) return <main className="auth-page"><p className="status-message">Loading...</p></main>
+
+  if (!user && location.pathname !== "/login" && location.pathname !== "/register") {
+    return <Navigate to="/login" replace />
+  }
+
+  async function signOut() {
+    await logout()
+    setUser(null)
+    navigate("/login")
+  }
+
   return (
-    <BrowserRouter>
-      <nav className="main-nav">
+    <>
+      {user && <nav className="main-nav">
         <div className="nav-content">
           <Link className="brand" to="/sessions">BookWAis</Link>
           <div className="nav-links">
             <Link to="/sessions">Sessions</Link>
             <Link to="/reservations">My reservations</Link>
-            <Link to="/admin/sessions">Manage sessions</Link>
-            <Link to="/admin/speakers">Speakers</Link>
-            <Link to="/admin/dashboard">Dashboard</Link>
+            {user.role === "Admin" && <>
+              <Link to="/admin/sessions">Manage sessions</Link>
+              <Link to="/admin/speakers">Speakers</Link>
+              <Link to="/admin/dashboard">Dashboard</Link>
+            </>}
+            <button className="nav-logout" onClick={signOut}>Sign out</button>
           </div>
         </div>
-      </nav>
+      </nav>}
       <Routes>
-        <Route path="/" element={<SessionsPage />} />
+        <Route path="/" element={<Navigate to={user ? "/sessions" : "/login"} replace />} />
+        <Route path="/login" element={user ? <Navigate to="/sessions" replace /> : <LoginPage onLogin={setUser} />} />
+        <Route path="/register" element={user ? <Navigate to="/sessions" replace /> : <RegisterPage onLogin={setUser} />} />
         <Route path="/sessions" element={<SessionsPage />} />
         <Route path="/reservations" element={<ReservationsPage />} />
         <Route path="/admin/sessions" element={<AdminSessionsPage />} />
         <Route path="/admin/speakers" element={<AdminSpeakersPage />} />
         <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
       </Routes>
+    </>
+  )
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <AppRoutes />
     </BrowserRouter>
   )
 }
