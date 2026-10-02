@@ -325,6 +325,93 @@ button {
   gap: 12px;
 }
 
+.dashboard-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.dashboard-card {
+  padding: 22px;
+  border: 1px solid #e4eaf2;
+  border-radius: 14px;
+  background: #ffffff;
+}
+
+.dashboard-card-header,
+.capacity-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.dashboard-session-title {
+  margin: 0 0 4px;
+  color: #172033;
+  font-weight: 700;
+}
+
+.dashboard-session-meta,
+.capacity-summary span,
+.capacity-remaining,
+.dashboard-update-note {
+  margin: 0;
+  color: #667085;
+  font-size: 0.88rem;
+}
+
+.dashboard-update-note {
+  margin-top: 8px !important;
+  font-size: 0.88rem !important;
+}
+
+.capacity-open,
+.capacity-full {
+  font-size: 0.78rem;
+}
+
+.capacity-open {
+  color: #067647;
+}
+
+.capacity-full {
+  color: #b42318;
+}
+
+.capacity-summary {
+  align-items: baseline;
+  margin-top: 28px;
+}
+
+.capacity-summary strong {
+  color: #172033;
+  font-size: 1.8rem;
+}
+
+.capacity-track {
+  height: 9px;
+  margin: 16px 0 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #eaecf0;
+}
+
+.capacity-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: #3366cc;
+}
+
+.capacity-remaining {
+  text-align: right;
+}
+
+.dashboard-refresh {
+  margin-top: 24px;
+}
+
 .admin-row {
   display: flex;
   align-items: center;
