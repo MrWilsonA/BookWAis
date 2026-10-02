@@ -1,6 +1,8 @@
 import { BrowserRouter, Link, Route, Routes } from "react-router-dom"
 import SessionsPage from "./pages/SessionsPage"
 import ReservationsPage from "./pages/ReservationsPage"
+import AdminSessionsPage from "./pages/AdminSessionsPage"
+import AdminSpeakersPage from "./pages/AdminSpeakersPage"
 
 function App() {
   return (
@@ -11,6 +13,8 @@ function App() {
           <div className="nav-links">
             <Link to="/sessions">Sessions</Link>
             <Link to="/reservations">My reservations</Link>
+            <Link to="/admin/sessions">Manage sessions</Link>
+            <Link to="/admin/speakers">Speakers</Link>
           </div>
         </div>
       </nav>
@@ -18,6 +22,8 @@ function App() {
         <Route path="/" element={<SessionsPage />} />
         <Route path="/sessions" element={<SessionsPage />} />
         <Route path="/reservations" element={<ReservationsPage />} />
+        <Route path="/admin/sessions" element={<AdminSessionsPage />} />
+        <Route path="/admin/speakers" element={<AdminSpeakersPage />} />
       </Routes>
     </BrowserRouter>
   )
