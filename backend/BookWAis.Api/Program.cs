@@ -55,6 +55,7 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    await context.Database.MigrateAsync();
     var hasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher<User>>();
     var admin = await context.Users.FirstOrDefaultAsync(user => user.Name == "WADMIN");
 

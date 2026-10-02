@@ -1,0 +1,41 @@
+services:
+  database:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: bookwais
+      POSTGRES_USER: bookwais
+      POSTGRES_PASSWORD: bookwais
+    ports:
+      - "5432:5432"
+    volumes:
+      - bookwais-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bookwais -d bookwais"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backend/BookWAis.Api
+    environment:
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__DefaultConnection: Host=database;Port=5432;Database=bookwais;Username=bookwais;Password=bookwais
+    ports:
+      - "5011:8080"
+    depends_on:
+      database:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+    environment:
+      VITE_API_URL: http://localhost:5011/api
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+
+volumes:
+  bookwais-data:

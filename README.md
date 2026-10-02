@@ -96,3 +96,13 @@ Scenarios:
 - Cancellation while new bookings are submitted
 
 Expected results: no overbooking, no duplicate reservations, consistent capacity updates, and appropriate success or conflict responses.
+
+## Run with Docker
+
+Install Docker Desktop, then run from the project root:
+
+```text
+docker compose up --build
+```
+
+Open `http://localhost:5173`. The Compose setup starts PostgreSQL, applies migrations through the backend, and starts the frontend with `VITE_API_URL` from the Compose environment.
