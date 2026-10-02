@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
 import type { Session } from "../types/session";
 import { createReservation, getSessions } from "../api/sessions";
+import { getSpeakers } from "../api/speakers";
+import type { Speaker } from "../types/speaker";
 
 export default function SessionsPage() {
     const [sessions, setSessions] = useState<Session[]>([])
+    const [speakers, setSpeakers] = useState<Speaker[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState("")
     const [userId, setUserId] = useState(1)
@@ -11,8 +14,11 @@ export default function SessionsPage() {
     const [message, setMessage] = useState("")
 
     useEffect(() => {
-        getSessions()
-            .then(setSessions)
+        Promise.all([getSessions(), getSpeakers()])
+            .then(([sessionData, speakerData]) => {
+                setSessions(sessionData)
+                setSpeakers(speakerData)
+            })
             .catch(() => setError("Failed to load sessions"))
             .finally(() => setLoading(false))
     }, [])
@@ -69,6 +75,7 @@ export default function SessionsPage() {
                         <article className="session-card" key={session.id}>
                             <h2>{session.title}</h2>
                             <div className="session-details">
+                                <p className="session-detail"><strong>Speaker</strong><span>{speakers.find((speaker) => speaker.id === session.speakerId)?.name ?? "Unavailable"}</span></p>
                                 <p className="session-detail"><strong>Room</strong><span>{session.room}</span></p>
                                 <p className="session-detail"><strong>Time</strong><span>{new Date(session.startTime).toLocaleString()} - {new Date(session.endTime).toLocaleString()}</span></p>
                             </div>
