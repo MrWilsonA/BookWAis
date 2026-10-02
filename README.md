@@ -1,60 +1,98 @@
 # BookWAis
-BookWAis is a simple workshhop booking web application for conferences or training event
 
+Workshop booking application for conferences and training events.
 
 ## Features
-### Participant
-- View available workshop sessions
-- View session information
-- View remaining seat availability
+
+Participant:
+
+- Browse sessions and remaining seats
 - Reserve a seat
-- View current reservations
-- Cancel a reservation
-- Receive a clear response when a session is full
-- Prevent duplicate booking for the same session
+- View and cancel reservations
 
-### Admin
-- Create, update, and delete sessions
-- Manage session title, room, time, speaker, and capacity
-- Create, update, and delete speakers
-- View the number of participants registered for each session
-- Increase or decrease session capacity
-- Monitor booking status from the admin dashboard
+Admin:
 
+- Manage sessions, speakers, schedules, rooms, and capacity
+- Monitor registered participants and session capacity
 
-## Pages
-### Participant
-- Sessions (Browse sessions, view availability, and reserve a seat)
-- My Reservations (View and cancel existing reservation)
+## Stack
 
-### Admin
-- Dashboard (Monitor current bookings and session capacity)
-- Manage Sessions (CUD sessions and change capacity)
-- Manage Speakers (CUD speaker information)
+- Frontend: React, TypeScript, Vite
+- Backend: .NET 10 ASP.NET Core Web API
+- Database: PostgreSQL with Entity Framework Core
+- Load testing: NBomber
 
+## Project Structure
 
-## Technology
-### Frontend
-- React
-- Typescript
-- Vite
+```text
+backend/BookWAis.Api       ASP.NET Core API
+frontend                   React application
+tests/BookWAis.LoadTests   Load and concurrency tests
+```
 
-### Backend
-- .NET 10
-- ASP.NET Core Web API
-- Entity Framework Core
+## Requirements
 
-### Database
+- .NET 10 SDK
+- Node.js
 - PostgreSQL
 
-### Testing
-- xUnit
-- Integration Testing
-- Load / Concurrency Testing
+## Run Backend
 
+Configure the PostgreSQL connection string with .NET User Secrets, then run:
 
-## Main Rules
-- A participant cannot book the same session more than once
-- Reservations cannot exceed session capacity
-- Cancelled reservations make seats available again
-- Capacity cannot be reduced below current reservations
+```text
+cd backend/BookWAis.Api
+dotnet ef database update
+dotnet run
+```
+
+The API runs at `http://localhost:5011`.
+
+## Run Frontend
+
+Create `frontend/.env`:
+
+```text
+VITE_API_URL=http://localhost:5011/api
+```
+
+Then run:
+
+```text
+cd frontend
+npm install
+npm run dev
+```
+
+## Frontend Pages
+
+- `/sessions` participant session list and booking
+- `/reservations` participant reservations
+- `/admin/sessions` session management
+- `/admin/speakers` speaker management
+- `/admin/dashboard` booking monitoring
+
+## Concurrency Control
+
+Booking, capacity updates, and cancellation use a database transaction with PostgreSQL `FOR UPDATE` on the session row.
+
+The booking flow locks the session, checks duplicate reservations and capacity, saves the reservation, and commits the transaction.
+
+The database also enforces a unique `(UserId, SessionId)` constraint and an index on `Reservations.SessionId`.
+
+## Load Tests
+
+Run from `tests/BookWAis.LoadTests` while the backend is running:
+
+```text
+dotnet run
+```
+
+Scenarios:
+
+- 1,000 simultaneous session reads
+- 50 booking requests for the final 5 seats
+- Booking while capacity is decreased
+- Cancellation while new bookings are submitted
+
+Expected results: no overbooking, no duplicate reservations, consistent capacity updates, and appropriate success or conflict responses.
