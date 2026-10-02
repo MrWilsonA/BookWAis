@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
 import type { Session } from "../types/session";
-import { getSessions } from "../api/sessions";
+import { createReservation, getSessions } from "../api/sessions";
 
 export default function SessionsPage() {
     const [sessions, setSessions] = useState<Session[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState("")
+    const [userId, setUserId] = useState(1)
+    const [bookingId, setBookingId] = useState<number | null>(null)
+    const [message, setMessage] = useState("")
 
     useEffect(() => {
         getSessions()
@@ -13,6 +16,22 @@ export default function SessionsPage() {
             .catch(() => setError("Failed to load sessions"))
             .finally(() => setLoading(false))
     }, [])
+
+    async function reserve(sessionId: number) {
+        setBookingId(sessionId)
+        setMessage("")
+
+        try {
+            await createReservation(userId, sessionId)
+            const updatedSessions = await getSessions()
+            setSessions(updatedSessions)
+            setMessage("Reservation confirmed")
+        } catch (bookingError) {
+            setMessage(bookingError instanceof Error ? bookingError.message : "Reservation failed")
+        } finally {
+            setBookingId(null)
+        }
+    }
 
     if (loading) {
         return <main className="sessions-page"><p className="status-message">Loading sessions...</p></main>
@@ -30,6 +49,18 @@ export default function SessionsPage() {
                 <p>Choose a session and reserve your seat in a few steps.</p>
             </header>
 
+            <div className="participant-bar">
+                <label htmlFor="participant-id">Participant ID</label>
+                <input
+                    id="participant-id"
+                    min="1"
+                    type="number"
+                    value={userId}
+                    onChange={(event) => setUserId(Number(event.target.value))}
+                />
+                {message && <span className="booking-message">{message}</span>}
+            </div>
+
             <section className="sessions-grid">
                 {sessions.map((session) => {
                     const isFull = session.remainingSeats === 0
@@ -45,8 +76,12 @@ export default function SessionsPage() {
                                 <span className={`seat-count${isFull ? " full" : ""}`}>
                                     {isFull ? "Session full" : `${session.remainingSeats} seats left`}
                                 </span>
-                                <button className="reserve-button" disabled={isFull}>
-                                    {isFull ? "Full" : "Reserve"}
+                                <button
+                                    className="reserve-button"
+                                    disabled={isFull || bookingId !== null || userId < 1}
+                                    onClick={() => reserve(session.id)}
+                                >
+                                    {isFull ? "Full" : bookingId === session.id ? "Booking..." : "Reserve"}
                                 </button>
                             </footer>
                         </article>
