@@ -6,7 +6,7 @@ export async function getSessions(): Promise<Session[]> {
     const response = await fetch(`${apiUrl}/Sessions`)
 
     if (!response.ok) {
-        throw new Error("Failed to load sessions")
+        throw new Error(`Request failed with status ${response.status}`)
     }
 
     return response.json()
