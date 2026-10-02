@@ -41,7 +41,7 @@ function AppRoutes() {
           <Link className="brand" to="/sessions">BookWAis</Link>
           <div className="nav-links">
             <Link to="/sessions">Sessions</Link>
-            <Link to="/reservations">My reservations</Link>
+            {!isAdmin && <Link to="/reservations">My reservations</Link>}
             {isAdmin && <>
               <Link to="/admin/sessions">Manage sessions</Link>
               <Link to="/admin/speakers">Speakers</Link>
@@ -56,7 +56,7 @@ function AppRoutes() {
         <Route path="/login" element={user ? <Navigate to="/sessions" replace /> : <LoginPage onLogin={setUser} />} />
         <Route path="/register" element={user ? <Navigate to="/sessions" replace /> : <RegisterPage onLogin={setUser} />} />
         <Route path="/sessions" element={<SessionsPage />} />
-        <Route path="/reservations" element={<ReservationsPage />} />
+        <Route path="/reservations" element={!isAdmin ? <ReservationsPage /> : <Navigate to="/sessions" replace />} />
         <Route path="/admin/sessions" element={isAdmin ? <AdminSessionsPage /> : <Navigate to="/sessions" replace />} />
         <Route path="/admin/speakers" element={isAdmin ? <AdminSpeakersPage /> : <Navigate to="/sessions" replace />} />
         <Route path="/admin/dashboard" element={isAdmin ? <AdminDashboardPage /> : <Navigate to="/sessions" replace />} />
