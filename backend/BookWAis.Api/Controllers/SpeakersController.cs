@@ -3,6 +3,7 @@ using BookWAis.Api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace BookWAis.Api.Controllers;
 
@@ -11,16 +12,23 @@ namespace BookWAis.Api.Controllers;
 public class SpeakersController : ControllerBase
 {
     private readonly AppDbContext _context;
+    private readonly IMemoryCache _cache;
 
-    public SpeakersController(AppDbContext context)
+    public SpeakersController(AppDbContext context, IMemoryCache cache)
     {
         _context = context;
+        _cache = cache;
     }
 
     [HttpGet]
     public async Task<List<Speaker>> GetSpeakers()
     {
-        return await _context.Speakers.ToListAsync();
+        if (_cache.TryGetValue("speakers", out List<Speaker>? speakers) && speakers != null)
+            return speakers;
+
+        speakers = await _context.Speakers.AsNoTracking().ToListAsync();
+        _cache.Set("speakers", speakers, TimeSpan.FromSeconds(30));
+        return speakers;
     }
 
     [HttpPost]
@@ -29,6 +37,8 @@ public class SpeakersController : ControllerBase
     {
         _context.Speakers.Add(speaker);
         await _context.SaveChangesAsync();
+
+        _cache.Remove("speakers");
 
         return speaker;
     }
@@ -48,6 +58,8 @@ public class SpeakersController : ControllerBase
 
         await _context.SaveChangesAsync();
 
+        _cache.Remove("speakers");
+
         return existingSpeaker;
     }
 
@@ -61,6 +73,8 @@ public class SpeakersController : ControllerBase
 
         _context.Speakers.Remove(existingSpeaker);
         await _context.SaveChangesAsync();
+
+        _cache.Remove("speakers");
 
         return existingSpeaker;
     }
