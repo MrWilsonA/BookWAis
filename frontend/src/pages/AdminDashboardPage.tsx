@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from "react"
-import { getReservations, getSessions } from "../api/sessions"
-import type { Reservation } from "../types/reservation"
+import { getSessions } from "../api/sessions"
 import type { Session } from "../types/session"
 
 type DashboardSession = Session & { bookedCount: number }
@@ -11,16 +10,10 @@ export default function AdminDashboardPage() {
     const [message, setMessage] = useState("")
 
     const loadDashboard = useCallback(async () => {
-        const [sessions, reservations] = await Promise.all([getSessions(), getReservations()])
-        const counts = new Map<number, number>()
-
-        reservations.forEach((reservation: Reservation) => {
-            counts.set(reservation.sessionId, (counts.get(reservation.sessionId) ?? 0) + 1)
-        })
-
+        const sessions = await getSessions()
         setItems(sessions.map((session) => ({
             ...session,
-            bookedCount: counts.get(session.id) ?? 0,
+            bookedCount: session.capacity - session.remainingSeats,
         })))
     }, [])
 
