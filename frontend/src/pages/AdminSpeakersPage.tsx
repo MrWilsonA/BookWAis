@@ -77,8 +77,8 @@ export default function AdminSpeakersPage() {
                 <div className="form-grid">
                     <label>Name<input required value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} /></label>
                     <label>Profile<input required value={form.profile} onChange={(event) => setForm({ ...form, profile: event.target.value })} /></label>
-                    <label>Biography<textarea required rows={4} value={form.biography} onChange={(event) => setForm({ ...form, biography: event.target.value })} /></label>
-                    <label>Photo URL<input type="url" placeholder="https://example.com/photo.jpg" value={form.photoUrl} onChange={(event) => setForm({ ...form, photoUrl: event.target.value })} /></label>
+                    <label className="speaker-large-field">Biography<textarea required rows={4} value={form.biography} onChange={(event) => setForm({ ...form, biography: event.target.value })} /></label>
+                    <label className="speaker-large-field">Photo URL<input type="url" placeholder="https://example.com/photo.jpg" value={form.photoUrl} onChange={(event) => setForm({ ...form, photoUrl: event.target.value })} /></label>
                 </div>
                 <div className="form-actions">
                     <button className="reserve-button" disabled={busy}>{busy ? "Saving..." : editingId === null ? "Create speaker" : "Save changes"}</button>

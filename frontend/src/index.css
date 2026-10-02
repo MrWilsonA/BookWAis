@@ -113,6 +113,12 @@ button {
   font-weight: 600;
 }
 
+.participant-bar::after {
+  content: "Saved on this browser";
+  color: #98a2b3;
+  font-size: 0.78rem;
+}
+
 .participant-bar input {
   width: 88px;
   border: 1px solid #d0d5dd;
@@ -271,10 +277,23 @@ button {
 
 .speaker-details {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 16px;
   min-width: 0;
   overflow-wrap: anywhere;
+}
+
+.form-grid .speaker-large-field {
+  grid-template-rows: auto 100px;
+}
+
+.speaker-large-field input,
+.speaker-large-field textarea {
+  height: 100px;
+}
+
+.speaker-large-field textarea {
+  resize: none;
 }
 
 .speaker-photo {
@@ -466,6 +485,10 @@ button {
   .participant-bar {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .participant-bar::after {
+    margin-top: -4px;
   }
 
   .form-grid {

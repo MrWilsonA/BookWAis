@@ -3,13 +3,14 @@ import type { Session } from "../types/session";
 import { createReservation, getSessions } from "../api/sessions";
 import { getSpeakers } from "../api/speakers";
 import type { Speaker } from "../types/speaker";
+import { getParticipantId, saveParticipantId } from "../utils/participant";
 
 export default function SessionsPage() {
     const [sessions, setSessions] = useState<Session[]>([])
     const [speakers, setSpeakers] = useState<Speaker[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState("")
-    const [userId, setUserId] = useState(1)
+    const [userId, setUserId] = useState(getParticipantId)
     const [bookingId, setBookingId] = useState<number | null>(null)
     const [message, setMessage] = useState("")
 
@@ -62,7 +63,11 @@ export default function SessionsPage() {
                     min="1"
                     type="number"
                     value={userId}
-                    onChange={(event) => setUserId(Number(event.target.value))}
+                    onChange={(event) => {
+                        const id = Number(event.target.value)
+                        setUserId(id)
+                        saveParticipantId(id)
+                    }}
                 />
                 {message && <span className="booking-message">{message}</span>}
             </div>

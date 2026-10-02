@@ -2,9 +2,10 @@ import { useEffect, useState } from "react"
 import { deleteReservation, getReservations, getSessions } from "../api/sessions"
 import type { Reservation } from "../types/reservation"
 import type { Session } from "../types/session"
+import { getParticipantId, saveParticipantId } from "../utils/participant"
 
 export default function ReservationsPage() {
-    const [userId, setUserId] = useState(1)
+    const [userId, setUserId] = useState(getParticipantId)
     const [reservations, setReservations] = useState<Reservation[]>([])
     const [sessions, setSessions] = useState<Session[]>([])
     const [loading, setLoading] = useState(true)
@@ -57,7 +58,11 @@ export default function ReservationsPage() {
                     min="1"
                     type="number"
                     value={userId}
-                    onChange={(event) => setUserId(Number(event.target.value))}
+                    onChange={(event) => {
+                        const id = Number(event.target.value)
+                        setUserId(id)
+                        saveParticipantId(id)
+                    }}
                 />
                 {message && <span className="booking-message">{message}</span>}
             </div>
