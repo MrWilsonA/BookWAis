@@ -36,6 +36,31 @@ tests/BookWAis.LoadTests   Load and concurrency tests
 - Node.js
 - PostgreSQL
 
+## Installation
+
+Restore the backend dependencies:
+
+```text
+cd backend/BookWAis.Api
+dotnet restore
+```
+
+Install the frontend dependencies:
+
+```text
+cd frontend
+npm install
+```
+
+Restore the load-test dependencies:
+
+```text
+cd tests/BookWAis.LoadTests
+dotnet restore
+```
+
+For local execution, configure the PostgreSQL connection string with .NET User Secrets before running the backend. For Docker execution, Docker Compose creates and configures the PostgreSQL service automatically.
+
 ## Run Backend
 
 Configure the PostgreSQL connection string with .NET User Secrets, then run:
@@ -85,8 +110,20 @@ The database also enforces a unique `(UserId, SessionId)` constraint and an inde
 Run from `tests/BookWAis.LoadTests` while the backend is running:
 
 ```text
-dotnet run
+cd tests/BookWAis.LoadTests
+dotnet run -- browse
 ```
+
+Select a scenario with the command argument:
+
+```text
+dotnet run -- browse
+dotnet run -- booking <session-id>
+dotnet run -- capacity <session-id> <new-capacity>
+dotnet run -- cancellation <session-id>
+```
+
+`browse` sends 1,000 session requests. `booking` sends 50 booking requests. `capacity` runs booking requests while updating the selected session capacity. `cancellation` runs cancellation and booking requests at the same time. Replace `<session-id>` with an existing session ID. The selected session must be prepared for the scenario before running the test.
 
 Scenarios:
 
